@@ -82,7 +82,7 @@ async def rabbit_slash(interaction: discord.Interaction):
                 embed = discord.Embed(
                     title="Random Rabbit!",
                     description=random.choice(cute_messages),
-                    color=discord.Color.blue()  # Giving it a warm bunny-like color
+                    color=discord.Color.blue()  
                 )
                 embed.set_image(url=data["media"]["poster"])
                 embed.set_footer(text="Isin't it  cute? 🐇")
@@ -216,19 +216,6 @@ ANIMALS = {
         ]
     },
 
-    "rabbit": {
-       "url": "https://api.bunnies.io/v2/loop/random/?media=png",
-       "key": "media.poster",
-       "color": discord.Color.from_rgb(245, 220, 255),
-       "messages": [
-           "Hop protocol initiated.",
-           "Warning: Extreme softness detected.",
-           "Carrot-powered cuteness.",
-           "This bunny outranks stress.",
-           "Fluff velocity: high."
-       ]
-    },
-
     "cat": {
         "url": "https://api.thecatapi.com/v1/images/search",
         "key": "0.url",
@@ -281,7 +268,7 @@ ANIMALS = {
     }
 }
 
-async def fetch_animal(animal):
+async def fetch_animal(ANIMALS):
     config = ANIMALS[animal]
 
     async with aiohttp.ClientSession() as session:
@@ -296,12 +283,6 @@ async def fetch_animal(animal):
             try:
                 if key == "0.url":
                     image = data[0]["url"]
-
-                elif "." in key:
-                    image = data
-                    for k in key.split("."):
-                        image = image[k]
-
                 else:
                     image = data[key]
 
@@ -318,13 +299,21 @@ async def fetch_animal(animal):
 
             return embed
 
+
 @bot.tree.command(name="randomanimal", description="Get a surprise animal!")
 async def randomanimal(interaction: discord.Interaction):
 
     animal = random.choice(list(ANIMALS.keys()))
     embed = await fetch_animal(animal)
 
+    if embed is None:
+        await interaction.response.send_message(
+            "That animal is hiding right now. Try again!"
+        )
+        return
+
     await interaction.response.send_message(embed=embed)
+
 
 @bot.tree.command(name="animal", description="Choose an animal!")
 @app_commands.choices(animal=[
@@ -335,6 +324,5 @@ async def animal(interaction: discord.Interaction, animal: app_commands.Choice[s
 
     embed = await fetch_animal(animal.value)
     await interaction.response.send_message(embed=embed)
-
-
 bot.run("TOKEN")
+
