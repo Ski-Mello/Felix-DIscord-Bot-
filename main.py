@@ -336,4 +336,5 @@ async def animal(interaction: discord.Interaction, animal: app_commands.Choice[s
     embed = await fetch_animal(animal.value)
     await interaction.response.send_message(embed=embed)
 
-bot.run("MTQ2OTI1MzczNDkwNjMzNTMxMg.GxiZht.oS9vF-o663TZIddfQ6h7Tykhs5O8xpK0WIUeEY")
+
+bot.run("TOKEN")
